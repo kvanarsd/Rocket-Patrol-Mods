@@ -35,6 +35,7 @@ class Play extends Phaser.Scene {
             frameRate: 30
         })
 
+        // score displayed
         this.p1Score = 0;
         let scoreConfig = {
             fontFamily: "Courier",
@@ -51,8 +52,8 @@ class Play extends Phaser.Scene {
 
         this.scoreLeft = this.add.text(borderUISize + borderPadding, borderUISize + borderPadding * 2, this.p1Score, scoreConfig);
         
+        // game over countdown
         this.gameOver = false;
-
         scoreConfig.fixedWidth = 0;
         this.clock = this.time.delayedCall(game.settings.gameTimer, () => {
             this.add.text(game.config.width/2, game.config.height/2, "GAMEOVER", scoreConfig).setOrigin(0.5);
@@ -60,6 +61,21 @@ class Play extends Phaser.Scene {
             this.gameOver = true;
         }, null, this);
         
+        // displayed clock countdown
+        let timeConfig = {
+            fontFamily: "Courier",
+            fontSize: "28px",
+            backgroundColor: "#F3B141",
+            color: "#843605",
+            align: "right",
+            padding: {
+                tom: 5,
+                bottom: 5,
+            },
+            fixedWidth: 100
+        }
+
+        this.countDown = this.add.text(game.config.width/2 + borderPadding**2 + borderUISize*2, borderUISize + borderPadding * 2, Math.floor(this.clock.getRemainingSeconds()), timeConfig);
     }
 
     update() {
@@ -88,6 +104,8 @@ class Play extends Phaser.Scene {
             this.p1Rocket.reset();
             this.shipExplode(this.ship01);
         }
+
+        this.countDown.text = Math.floor(this.clock.getRemainingSeconds());
     }
 
     checkCollision(rocket, ship) {
