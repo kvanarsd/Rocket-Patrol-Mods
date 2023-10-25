@@ -12,8 +12,9 @@ class Play extends Phaser.Scene {
         this.load.image('counter', './assets/Counter.png');
         this.load.image('backCounter', './assets/Back_Counter.png');
         this.load.image('back', './assets/Back.png');
+        this.load.image('end', './assets/Over.png');
         this.load.spritesheet('slices', './assets/slices.png', {frameWidth: 42, frameHeight: 42, startFrame: 0, endFrame: 7});
-        this.load.spritesheet('explosion', './assets/explosion.png', {frameWidth: 64, frameHeight: 32, startFrame: 0, endFrame: 9});
+        this.load.spritesheet('explosion', './assets/explosion.png', {frameWidth: 57, frameHeight: 54, startFrame: 0, endFrame: 3});
     }
 
     create() {
@@ -29,11 +30,11 @@ class Play extends Phaser.Scene {
         this.add.rectangle(0, game.config.height - borderUISize, game.config.width, borderUISize, 0xFFFFFF).setOrigin(0, 0);
         this.add.rectangle(0, 0, borderUISize, game.config.height, 0xFFFFFF).setOrigin(0, 0);
         this.add.rectangle(game.config.width - borderUISize, 0, borderUISize, game.config.height, 0xFFFFFF).setOrigin(0, 0);
-        this.p1Rocket = new Rocket(this, game.config.width/2, game.config.height  - borderUISize*2 - borderPadding, 'rocket').setOrigin(0, 0);
+        this.p1Rocket = new Rocket(this, game.config.width/2, game.config.height - borderUISize * 2 - borderPadding, 'rocket').setOrigin(0, 0);
         this.ship01 = new Spaceship(this, game.config.width + borderUISize * 6, borderUISize * 4, 'spaceship', 0, 30).setOrigin(0, 0);
         this.ship02 = new Spaceship(this, game.config.width + borderUISize * 3, borderUISize * 5 + borderPadding * 2, 'spaceship2', 0, 20).setOrigin(0, 0);
         this.ship03 = new Spaceship(this, game.config.width, borderUISize * 6 + borderPadding * 4, 'spaceship3', 0, 10).setOrigin(0, 0);
-        this.slices = this.add.sprite(game.config.width / 2, borderUISize + borderPadding * 4, "slices", 1).setScale(1)
+        this.slices = this.add.sprite(game.config.width / 2, borderUISize + borderPadding * 4, "slices", 1).setScale(1.5)
 
         keyF = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.F);
         keyR = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.R);
@@ -42,8 +43,8 @@ class Play extends Phaser.Scene {
 
         this.anims.create({
             key: "explode",
-            frames: this.anims.generateFrameNumbers("explosion", {start: 0, end: 9, first: 0}),
-            frameRate: 30
+            frames: this.anims.generateFrameNumbers("explosion", {start: 0, end: 3, first: 0}),
+            frameRate: 12
         })
 
         this.anims.create({
@@ -106,7 +107,7 @@ class Play extends Phaser.Scene {
         this.p1Score = 0;
         this.p1Slices = 0;
         let scoreConfig = {
-            fontFamily: "Courier",
+            fontFamily: "Garamond Bold",
             fontSize: "28px",
             backgroundColor: "#facade",
             color: "#843605",
@@ -126,10 +127,18 @@ class Play extends Phaser.Scene {
         // game over countdown
         scoreConfig.fixedWidth = 0;
         this.gameOver = false;
+        this.end = this.add.tileSprite(0,0,640,480,'end').setOrigin(0,0);
+        this.end.visible = false;
         this.clock = this.time.delayedCall(game.settings.gameTimer, () => {
-            this.add.text(game.config.width/2, game.config.height/2, "GAMEOVER", scoreConfig).setOrigin(0.5);
-            this.add.text(game.config.width/2, game.config.height/2 + 64, "Press (R) to Restart", scoreConfig).setOrigin(0.5);
+            this.add.text(game.config.width/2, game.config.height - borderPadding * 2 - borderUISize, "Press (R) to Restart", scoreConfig).setOrigin(0.5);
+            this.add.text(game.config.width/5, borderPadding*2 + borderUISize * 2, "You got " + this.p1Slices + " slices", scoreConfig).setOrigin(0.5);
+            this.add.text(game.config.width - borderPadding*3 - borderUISize * 3, borderPadding*2 + borderUISize * 2, "And " + this.p1Score + " points!", scoreConfig).setOrigin(0.5);
+            scoreConfig.fontSize = "32px";
+            scoreConfig.backgroundColor = "#fff";
+            this.add.text(game.config.width/2, borderPadding + borderUISize, "GAMEOVER", scoreConfig).setOrigin(0.5);
             this.gameOver = true;
+            this.end.visible = true;
+            this.countDown.visible = false;
         }, null, this);
         
         // displayed clock countdown
@@ -150,22 +159,15 @@ class Play extends Phaser.Scene {
     }
 
     update() {
-        // if(this.gameOver && Phaser.Input.Keyboard.JustDown(keyR)) {
-        //     if(this.p1Score > this.highScore){
-        //         highScore = this.p1Score;
-        //         this.highText.text = highScore;
-        //     }
-        //     this.scene.restart();
-        // }
+        if(this.gameOver && Phaser.Input.Keyboard.JustDown(keyR)) {
+        this.scene.restart();
+        }
 
         //this.starfield.tilePositionX -= 4;
         if(!this.gameOver){
             this.counter.tilePositionX -= 2;
             this.backcounter.tilePositionX -= 3;
             this.back.tilePositionX -= 4;
-        }
-
-        if(!this.gameOver) {
             this.p1Rocket.update();
             this.ship01.update();
             this.ship02.update();
@@ -221,7 +223,7 @@ class Play extends Phaser.Scene {
     shipExplode(ship) {
         ship.alpha = 0;
 
-        let boom = this.add.sprite(ship.x, ship.y, "explosion").setOrigin(0,0);
+        let boom = this.add.sprite(ship.x, ship.y - 11, "explosion").setOrigin(0,0);
         boom.anims.play("explode");
         boom.on("animationcomplete", () => {
             ship.reset();
@@ -232,6 +234,7 @@ class Play extends Phaser.Scene {
         this.p1Score += ship.points;
         this.p1Slices++;
         this.scoreLeft.text = this.p1Score;
-        this.sound.play("sfx_explosion");
+        let soundNum = Phaser.Math.Between(1, 4);
+        this.sound.play("sfx_explosion-" + soundNum);
     }
 }
