@@ -5,24 +5,35 @@ class Play extends Phaser.Scene {
 
     preload() {
         this.load.image('rocket', './assets/rocket.png');
-        this.load.image('spaceship', './assets/spaceship.png');
-        this.load.image('starfield', './assets/starfield.png');
+        this.load.image('spaceship', './assets/cake.png');
+        this.load.image('spaceship2', './assets/cococake.png');
+        this.load.image('spaceship3', './assets/pie.png');
+        //this.load.image('starfield', './assets/starfield.png');
+        this.load.image('counter', './assets/Counter.png');
+        this.load.image('backCounter', './assets/Back_Counter.png');
+        this.load.image('back', './assets/Back.png');
+        this.load.spritesheet('slices', './assets/slices.png', {frameWidth: 42, frameHeight: 42, startFrame: 0, endFrame: 7});
         this.load.spritesheet('explosion', './assets/explosion.png', {frameWidth: 64, frameHeight: 32, startFrame: 0, endFrame: 9});
     }
 
     create() {
-        this.starfield = this.add.tileSprite(0,0,640,480,'starfield').setOrigin(0,0);
+        //this.starfield = this.add.tileSprite(0,0,640,480,'starfield').setOrigin(0,0);
+        this.back = this.add.tileSprite(0,0,640,480,'back').setOrigin(0,0);
+        this.backcounter = this.add.tileSprite(0,0,640,480,'backCounter').setOrigin(0,0);
+        this.counter = this.add.tileSprite(0,0,640,480,'counter').setOrigin(0,0);
+        
         // green bckgr
-        this.add.rectangle(0, borderUISize + borderPadding, game.config.width, borderUISize * 2, 0x00FF00).setOrigin(0,0);
+        this.add.rectangle(0, borderUISize + borderPadding, game.config.width, borderUISize * 2, 0xffffff).setOrigin(0,0);
         // white borders
         this.add.rectangle(0, 0, game.config.width, borderUISize, 0xFFFFFF).setOrigin(0, 0);
         this.add.rectangle(0, game.config.height - borderUISize, game.config.width, borderUISize, 0xFFFFFF).setOrigin(0, 0);
         this.add.rectangle(0, 0, borderUISize, game.config.height, 0xFFFFFF).setOrigin(0, 0);
         this.add.rectangle(game.config.width - borderUISize, 0, borderUISize, game.config.height, 0xFFFFFF).setOrigin(0, 0);
-        this.p1Rocket = new Rocket(this, game.config.width/2, game.config.height - borderUISize - borderPadding, 'rocket').setOrigin(0.5, 0);
+        this.p1Rocket = new Rocket(this, game.config.width/2, game.config.height  - borderUISize*2 - borderPadding, 'rocket').setOrigin(0, 0);
         this.ship01 = new Spaceship(this, game.config.width + borderUISize * 6, borderUISize * 4, 'spaceship', 0, 30).setOrigin(0, 0);
-        this.ship02 = new Spaceship(this, game.config.width + borderUISize * 3, borderUISize * 5 + borderPadding * 2, 'spaceship', 0, 20).setOrigin(0, 0);
-        this.ship03 = new Spaceship(this, game.config.width, borderUISize * 6 + borderPadding * 4, 'spaceship', 0, 10).setOrigin(0, 0);
+        this.ship02 = new Spaceship(this, game.config.width + borderUISize * 3, borderUISize * 5 + borderPadding * 2, 'spaceship2', 0, 20).setOrigin(0, 0);
+        this.ship03 = new Spaceship(this, game.config.width, borderUISize * 6 + borderPadding * 4, 'spaceship3', 0, 10).setOrigin(0, 0);
+        this.slices = this.add.sprite(game.config.width / 2, borderUISize + borderPadding * 4, "slices", 1).setScale(1)
 
         keyF = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.F);
         keyR = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.R);
@@ -35,12 +46,69 @@ class Play extends Phaser.Scene {
             frameRate: 30
         })
 
+        this.anims.create({
+            key: "slices-1",
+            repeat: -1,
+            frames: this.anims.generateFrameNumbers("slices", {start: 7, end: 7}),
+            frameRate: 0
+        })
+
+        this.anims.create({
+            key: "slices-2",
+            repeat: -1,
+            frames: this.anims.generateFrameNumbers("slices", {start: 6, end: 6}),
+            frameRate: 0
+        })
+
+        this.anims.create({
+            key: "slices-3",
+            repeat: -1,
+            frames: this.anims.generateFrameNumbers("slices", {start: 5, end: 5}),
+            frameRate: 0
+        })
+
+        this.anims.create({
+            key: "slices-4",
+            repeat: -1,
+            frames: this.anims.generateFrameNumbers("slices", {start: 4, end: 4}),
+            frameRate: 0
+        })
+
+        this.anims.create({
+            key: "slices-5",
+            repeat: -1,
+            frames: this.anims.generateFrameNumbers("slices", {start: 3, end: 3}),
+            frameRate: 0
+        })
+
+        this.anims.create({
+            key: "slices-6",
+            repeat: -1,
+            frames: this.anims.generateFrameNumbers("slices", {start: 2, end: 2}),
+            frameRate: 0
+        })
+
+        this.anims.create({
+            key: "slices-7",
+            repeat: -1,
+            frames: this.anims.generateFrameNumbers("slices", {start: 1, end: 1}),
+            frameRate: 0
+        })
+
+        this.anims.create({
+            key: "slices-8",
+            repeat: -1,
+            frames: this.anims.generateFrameNumbers("slices", {start: 0, end: 0}),
+            frameRate: 0
+        })
+
         // score displayed
         this.p1Score = 0;
+        this.p1Slices = 0;
         let scoreConfig = {
             fontFamily: "Courier",
             fontSize: "28px",
-            backgroundColor: "#F3B141",
+            backgroundColor: "#facade",
             color: "#843605",
             align: "right",
             padding: {
@@ -52,9 +120,12 @@ class Play extends Phaser.Scene {
 
         this.scoreLeft = this.add.text(borderUISize + borderPadding, borderUISize + borderPadding * 2, this.p1Score, scoreConfig);
         
+        // highscore
+        //this.highText = this.add.text(game.config.width/2, borderUISize + borderPadding * 2, highScore, scoreConfig);
+
         // game over countdown
-        this.gameOver = false;
         scoreConfig.fixedWidth = 0;
+        this.gameOver = false;
         this.clock = this.time.delayedCall(game.settings.gameTimer, () => {
             this.add.text(game.config.width/2, game.config.height/2, "GAMEOVER", scoreConfig).setOrigin(0.5);
             this.add.text(game.config.width/2, game.config.height/2 + 64, "Press (R) to Restart", scoreConfig).setOrigin(0.5);
@@ -65,7 +136,7 @@ class Play extends Phaser.Scene {
         let timeConfig = {
             fontFamily: "Courier",
             fontSize: "28px",
-            backgroundColor: "#F3B141",
+            backgroundColor: "#facade",
             color: "#843605",
             align: "right",
             padding: {
@@ -75,15 +146,24 @@ class Play extends Phaser.Scene {
             fixedWidth: 100
         }
 
-        this.countDown = this.add.text(game.config.width/2 + borderPadding**2 + borderUISize*2, borderUISize + borderPadding * 2, Math.floor(this.clock.getRemainingSeconds()), timeConfig);
+        this.countDown = this.add.text(game.config.width/2 + borderPadding**2 + borderUISize*2, borderUISize + borderPadding * 2, Math.ceil(this.clock.getRemainingSeconds()), timeConfig);
     }
 
     update() {
-        if(this.gameOver && Phaser.Input.Keyboard.JustDown(keyR)) {
-            this.scene.restart();
-        }
+        // if(this.gameOver && Phaser.Input.Keyboard.JustDown(keyR)) {
+        //     if(this.p1Score > this.highScore){
+        //         highScore = this.p1Score;
+        //         this.highText.text = highScore;
+        //     }
+        //     this.scene.restart();
+        // }
 
-        this.starfield.tilePositionX -= 4;
+        //this.starfield.tilePositionX -= 4;
+        if(!this.gameOver){
+            this.counter.tilePositionX -= 2;
+            this.backcounter.tilePositionX -= 3;
+            this.back.tilePositionX -= 4;
+        }
 
         if(!this.gameOver) {
             this.p1Rocket.update();
@@ -105,7 +185,26 @@ class Play extends Phaser.Scene {
             this.shipExplode(this.ship01);
         }
 
-        this.countDown.text = Math.floor(this.clock.getRemainingSeconds());
+        if(this.clock.getElapsedSeconds() >= 30) {
+            this.ship01.time = true;
+            this.ship02.time = true;
+            this.ship03.time = true;
+        }
+
+        this.countDown.text = Math.ceil(this.clock.getRemainingSeconds());
+
+        if(this.p1Slices != 0){
+            let curSlices;
+            let cakes = Math.floor(this.p1Slices / 8);
+            curSlices = this.p1Slices - (8 * cakes);
+            if(this.p1Slices >= 7) {
+                curSlices++;
+            }
+            this.slices.play("slices-" + curSlices, true);
+            this.slices.visible = true;
+        } else {
+            this.slices.visible = false;
+        }
     }
 
     checkCollision(rocket, ship) {
@@ -131,6 +230,7 @@ class Play extends Phaser.Scene {
         });
 
         this.p1Score += ship.points;
+        this.p1Slices++;
         this.scoreLeft.text = this.p1Score;
         this.sound.play("sfx_explosion");
     }

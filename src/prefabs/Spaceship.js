@@ -5,6 +5,8 @@ class Spaceship extends Phaser.GameObjects.Sprite {
         scene.add.existing(this);
         this.points = pointValue;
         this.moveSpeed = game.settings.spaceshipSpeed;
+        this.notIncreased = true;
+        this.time = false;
     }
 
     update() {
@@ -12,6 +14,11 @@ class Spaceship extends Phaser.GameObjects.Sprite {
 
         if(this.x <= 0 - this.width) {
             this.reset();
+        }
+
+        if(this.notIncreased && this.time) {
+            this.moveSpeed += 2;
+            this.notIncreased = false;
         }
     }
 
